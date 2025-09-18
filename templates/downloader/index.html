@@ -7,6 +7,16 @@
 <body class="flex items-center justify-center min-h-screen bg-gray-100">
     <div class="bg-white shadow-xl rounded-xl p-6 w-full max-w-md">
         <h1 class="text-2xl font-bold mb-4 text-center">YouTube to MP3</h1>
+
+        <div class="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <h2 class="text-lg font-semibold text-blue-800 mb-2">How to Use</h2>
+            <ol class="list-decimal list-inside text-gray-700 space-y-1">
+                <li>Open YouTube and find the video you want to download.</li>
+                <li>Click the <span class="font-semibold">Share</span> button below the video.</li>
+                <li>In the popup, click <span class="font-semibold">Copy</span> to copy the video URL to your clipboard.</li>
+                <li>Paste the copied URL into the input field in this app below</li>
+            </ol>
+        </div>
         
         {% if error %}
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
@@ -29,6 +39,10 @@
                     <span id="progress-eta" class="ml-2"></span>
                 </div>
             </div>
+            <div class="text-sm text-gray-700 mt-2">
+                <span>Elapsed Time: <span id="timer">0</span> seconds</span>
+            </div>
+           
         </div>
 
         <form id="download-form" method="post" class="space-y-4">
@@ -126,6 +140,47 @@
                 document.getElementById('progress-bar').classList.add('bg-blue-600');
             }
         }
-    </script>
+   
+                let timerInterval;
+                let secondsElapsed = 0;
+
+                function startTimer() {
+                    secondsElapsed = 0;
+                    document.getElementById('timer').textContent = secondsElapsed;
+                    timerInterval = setInterval(() => {
+                    secondsElapsed += 1;
+                    document.getElementById('timer').textContent = secondsElapsed;
+                    }, 1000);
+                }
+
+                function stopTimer() {
+                    clearInterval(timerInterval);
+                }
+
+                // Start timer when progress container is shown
+                document.getElementById('download-form').addEventListener('submit', function() {
+                    startTimer();
+                });
+
+                // Stop timer when download completes or errors
+                function updateProgress(percent, message, status = 'downloading', speed = '', eta = '') {
+                    document.getElementById('progress-bar').style.width = percent + '%';
+                    document.getElementById('progress-percent').textContent = percent + '%';
+                    document.getElementById('progress-message').textContent = message;
+                    document.getElementById('progress-speed').textContent = speed;
+                    document.getElementById('progress-eta').textContent = eta;
+
+                    if (status === 'error') {
+                    document.getElementById('progress-bar').classList.add('bg-red-600');
+                    document.getElementById('progress-bar').classList.remove('bg-blue-600');
+                    stopTimer();
+                    } else if (status === 'completed') {
+                    stopTimer();
+                    } else {
+                    document.getElementById('progress-bar').classList.remove('bg-red-600');
+                    document.getElementById('progress-bar').classList.add('bg-blue-600');
+                    }
+                }
+                </script>
 </body>
 </html>
