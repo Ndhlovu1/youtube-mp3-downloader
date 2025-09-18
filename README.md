@@ -81,7 +81,7 @@ pipenv run python manage.py runserver
 http://127.0.0.1:8000/
 ```
 
-**Paste a YouTube link, click Download, and watch the progress bar update until your MP3 is ready.**
+**Paste a (Share) YouTube link, click Download, and watch the progress bar update until your MP3 is ready.**
 
 ---
 
