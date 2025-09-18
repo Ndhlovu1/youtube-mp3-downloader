@@ -1,5 +1,8 @@
 # 🎶 Django YouTube MP3 Downloader
 
+**@Author:** [Ndhlovu1](https://github.com/Ndhlovu1) : 18 Sep 2025
+
+
 A simple Django app that lets users paste a YouTube link and download the audio as an MP3, with progress tracking and a download button.
 
 Built using:
@@ -18,7 +21,23 @@ Built using:
 - No Viruses or harmful links and ADs
 ---
 
-## 🛠️ Setup Instructions
+## Tech Stack
+
+1. **Backend:** Django  
+2. **YouTube Download:** yt-dlp  
+3. **Audio Conversion:** FFmpeg  
+4. **Frontend:** Tailwind CSS  
+5. **Package Management:** pipenv
+---
+
+## Prerequisites
+
+1. Python 3.8+
+
+2. Pipenv, (see steps below)
+---
+
+## Setup Instructions
 
 ### 1. Clone the repository
 ```bash
@@ -64,15 +83,13 @@ http://127.0.0.1:8000/
 
 **Paste a YouTube link, click Download, and watch the progress bar update until your MP3 is ready.**
 
-## ⚡ Notes
+---
+
+## Notes
 
 1. This project currently stores progress in memory (download_progress dict). 
 
 2. Large files are read into memory; in production, consider writing to disk and streaming.
-
-## 🙌 Credits
-
-**Author:** [Ndhlovu1](https://github.com/Ndhlovu1)
-
+---
 
 
