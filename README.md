@@ -81,7 +81,12 @@ pipenv run python manage.py runserver
 http://127.0.0.1:8000/
 ```
 
-**Paste a (Share) YouTube link, click Download, and watch the progress bar update until your MP3 is ready.**
+### How to Use a Share YouTube URL
+
+1. Open YouTube and find the video you want to download.
+2. Click the **Share** button below the video.
+3. In the popup, click **Copy** to copy the video URL to your clipboard.
+4. Paste the copied URL into the input field in this app.
 
 ---
 
