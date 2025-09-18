@@ -14,7 +14,24 @@
         </div>
         {% endif %}
         
-        <form method="post" class="space-y-4">
+        <div id="progress-container" class="hidden mb-4">
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <h3 class="font-semibold text-blue-800 mb-2">Download Progress</h3>
+                <div class="w-full bg-gray-200 rounded-full h-2 mb-2">
+                    <div id="progress-bar" class="bg-blue-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                </div>
+                <div class="flex justify-between text-sm text-gray-600">
+                    <span id="progress-percent">0%</span>
+                    <span id="progress-message">Initializing...</span>
+                </div>
+                <div class="text-xs text-gray-500 mt-1">
+                    <span id="progress-speed"></span>
+                    <span id="progress-eta" class="ml-2"></span>
+                </div>
+            </div>
+        </div>
+
+        <form id="download-form" method="post" class="space-y-4">
             {% csrf_token %}
             {{ form.url }}
             <button type="submit" class="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-200">
@@ -22,5 +39,85 @@
             </button>
         </form>
     </div>
+
+    <script>
+        document.getElementById('download-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const url = formData.get('url');
+            const taskId = '{{ task_id|default:"" }}' || Math.random().toString(36).substr(2, 9);
+            
+            // Show progress container
+            document.getElementById('progress-container').classList.remove('hidden');
+            updateProgress(0, 'Starting download...');
+            
+            try {
+                // Start the download process
+                const startResponse = await fetch('/start-download/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    },
+                    body: JSON.stringify({ url: url, task_id: taskId })
+                });
+                
+                const startData = await startResponse.json();
+                
+                if (startData.status === 'error') {
+                    updateProgress(100, 'Error: ' + startData.message, 'error');
+                    return;
+                }
+                
+                // Poll for progress
+                const pollInterval = setInterval(async () => {
+                    try {
+                        const progressResponse = await fetch(`/progress/${taskId}/`);
+                        const progressData = await progressResponse.json();
+                        
+                        updateProgress(
+                            progressData.progress,
+                            progressData.message,
+                            progressData.status,
+                            progressData.speed,
+                            progressData.eta
+                        );
+                        
+                        if (progressData.status === 'completed') {
+                            clearInterval(pollInterval);
+                            // Redirect to download
+                            window.location.href = `/download-file/${taskId}/`;
+                        } else if (progressData.status === 'error') {
+                            clearInterval(pollInterval);
+                        }
+                    } catch (error) {
+                        console.error('Error polling progress:', error);
+                        clearInterval(pollInterval);
+                    }
+                }, 1000);
+                
+            } catch (error) {
+                console.error('Error starting download:', error);
+                updateProgress(100, 'Error starting download', 'error');
+            }
+        });
+        
+        function updateProgress(percent, message, status = 'downloading', speed = '', eta = '') {
+            document.getElementById('progress-bar').style.width = percent + '%';
+            document.getElementById('progress-percent').textContent = percent + '%';
+            document.getElementById('progress-message').textContent = message;
+            document.getElementById('progress-speed').textContent = speed;
+            document.getElementById('progress-eta').textContent = eta;
+            
+            if (status === 'error') {
+                document.getElementById('progress-bar').classList.add('bg-red-600');
+                document.getElementById('progress-bar').classList.remove('bg-blue-600');
+            } else {
+                document.getElementById('progress-bar').classList.remove('bg-red-600');
+                document.getElementById('progress-bar').classList.add('bg-blue-600');
+            }
+        }
+    </script>
 </body>
 </html>

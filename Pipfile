@@ -9,6 +9,7 @@ moviepy = "*"
 pytube = {git = "git+https://github.com/pytube/pytube.git"}
 requests = "*"
 yt-dlp = "*"
+channels = "*"
 
 [dev-packages]
 
